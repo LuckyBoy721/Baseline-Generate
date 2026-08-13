@@ -793,19 +793,6 @@ def login_outlet_gofood_flow(outlet_info):
                             access_token = attempt_token
                             break
 
-                        # Deteksi akun baru yang butuh verifikasi email
-                        try:
-                            error_msg1 = page.locator('text=/Email belum diverifikasi/i')
-                            error_msg2 = page.locator('text=/silahkan login ulang/i')
-                            if (error_msg1.count() > 0 and error_msg1.first.is_visible()) or \
-                               (error_msg2.count() > 0 and error_msg2.first.is_visible()):
-                                console.print("   [warning]⚠️ Terdeteksi akun baru: 'Email belum diverifikasi'. Mempercepat percobaan ulang...[/warning]")
-                                max_login_attempts = 3
-                                time.sleep(2.0)
-                                break
-                        except Exception:
-                            pass
-
                         # Deteksi OTP Salah / Kadaluarsa
                         try:
                             otp_err1 = page.locator('text=/kode salah/i')
@@ -835,19 +822,19 @@ def login_outlet_gofood_flow(outlet_info):
 
                         time.sleep(1.0)
 
-                        if time.time() - start_time > 15:
-                            # Fallback URL Check: Jika setelah 15 detik masih stuck di URL login, anggap butuh retry/verifikasi
+                        if time.time() - start_time > 5:
+                            # Fallback URL Check: Jika setelah 5 detik masih stuck di URL login, anggap butuh retry/verifikasi
                             try:
                                 if "/auth/login" in page.url:
-                                    console.print("   [warning]⚠️ (Fallback) Timeout 15 detik: URL masih stuck di halaman login. Mempercepat percobaan ulang...[/warning]")
+                                    console.print("   [warning]⚠️ (Fallback) Timeout 5 detik: URL masih stuck di halaman login. Mempercepat percobaan ulang...[/warning]")
                                     # Menambah kompensasi karena bisa jadi ini peringatan verifikasi yang terlewat dari deteksi teks
                                     max_login_attempts = 3
                                     break
                             except Exception:
                                 pass
 
-                        if time.time() - start_time > 25:
-                            console.print("[warning]⚠️ Timeout 25 detik menunggu access_token.[/warning]")
+                        if time.time() - start_time > 15:
+                            console.print("[warning]⚠️ Timeout 15 detik menunggu access_token.[/warning]")
                             break
 
                 except KeyboardInterrupt:
